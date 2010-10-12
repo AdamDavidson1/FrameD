@@ -1,0 +1,14 @@
+
+RewriteEngine On
+
+RewriteRule ^(favicon\.ico) www/$1  [QSA,L]
+RewriteRule ^(robots\.txt) www/$1  [QSA,L]
+RewriteRule ^(sitemap\.xml\.gz) www/$1  [QSA,L]
+RewriteRule ^(sitemap\.xml) www/$1  [QSA,L]
+RewriteRule ^(sitemap\.txt) www/$1  [QSA,L]
+RewriteRule (docs|style|images|swf|pdf|data|js|pub|stats)/(.*) www/$1/$2  [QSA,L]
+RewriteRule ^(www)/(.*) - [PT]
+RewriteRule ^(401\.shtml) - [PT]
+#RewriteRule ^$ index.php [QSA]
+RewriteRule ([^/]+)/([^.]+)?\.?(.*)? lib/api.php?controller=$1&action=$2&format=$3 [QSA,L]
+RewriteRule ([^.]+)?\.?(.*)? lib/api.php?controller=&action=$1&format=$2 [QSA,L]
