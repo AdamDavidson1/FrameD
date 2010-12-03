@@ -97,6 +97,45 @@ abstract class Controller{
     }
 
 /**
+ * Cache Control
+ * 
+ * @access private
+ * @param  int $expires Time in seconds DEFAULT 15 minutes
+ * @return void
+ */
+        public function cacheControl($expires=900){
+                if (strtotime(trim($_SERVER['HTTP_IF_NONE_MATCH']).' GMT') >= time()) {
+                    header("HTTP/1.1 304 Not Modified");
+                    exit;
+                }
+                $expires = 60*15;
+                header("Pragma: public");
+                header("Cache-Control: max-age=".$expires);
+                header('Expires: ' . gmdate('D, d M Y H:i:s', (time()+$expires)) . ' GMT');
+                header('Etag: '.gmdate('D, d M Y H:i:s', (time()+$expires)));
+                header("Last-Modified: ". gmdate('D, d M Y H:i:s', time()) . " GMT");
+
+                return;
+        }
+
+/**
+ * No Cache Control
+ * 
+ * @access public
+ * @return void
+ */
+        public function noCacheControl(){
+                header("Pragma: no-cache");
+                header("Cache-Control: no-cache, must-revalidate");
+                header('Expires: ' . gmdate('D, d M Y H:i:s', (time()-60*15)) . ' GMT');
+                header('Etag: '.gmdate('D, d M Y H:i:s', (time()-60*15)));
+                header("Last-Modified: ". gmdate('D, d M Y H:i:s', time()) . " GMT");
+
+                return;
+        }
+
+
+/**
  * Render
  * 
  * @access public
@@ -118,6 +157,7 @@ abstract class Controller{
 				 urlencode($this->sessionData->getEncrypted()).'; HttpOnly'
 				 );
 		}
+
 
 		if($this->format == '' || strtolower($this->format) == 'html' || strtolower($this->format) == 'php' && $view != NULL){
 
@@ -252,44 +292,6 @@ abstract class Controller{
 		ob_end_clean();
 
 		return $return;
-	}
-
-/**
- * Cache Control
- * 
- * @access private
- * @param  int $expires Time in seconds DEFAULT 15 minutes
- * @return void
- */
-        public function cacheControl($expires=900){
-		if (strtotime(trim($_SERVER['HTTP_IF_NONE_MATCH']).' GMT') >= time()) {
-		    header("HTTP/1.1 304 Not Modified");
-		    exit;
-		} 
-		$expires = 60*15;
-		header("Pragma: public");
-		header("Cache-Control: max-age=".$expires);
-		header('Expires: ' . gmdate('D, d M Y H:i:s', (time()+$expires)) . ' GMT');
-		header('Etag: '.gmdate('D, d M Y H:i:s', (time()+$expires)));
-		header("Last-Modified: ". gmdate('D, d M Y H:i:s', time()) . " GMT");
-
-		return;
-	}
-
-/**
- * No Cache Control
- * 
- * @access public
- * @return void
- */
-        public function noCacheControl(){
-		header("Pragma: no-cache");
-		header("Cache-Control: no-cache, must-revalidate");
-		header('Expires: ' . gmdate('D, d M Y H:i:s', (time()-60*15)) . ' GMT');
-		header('Etag: '.gmdate('D, d M Y H:i:s', (time()-60*15)));
-		header("Last-Modified: ". gmdate('D, d M Y H:i:s', time()) . " GMT");
-
-		return;
 	}
 
 /**

@@ -165,21 +165,37 @@ function loadFramework($cameFrom, $controller, $action, $format){
 			return;
 
 		} else {
-			if($config->environment['ERRORS']['404']){
-					$logger->trace('CALLING ERROR 404 LAST CHANCE');
-					require_once('core/app/controllers/error.php');
+				if(method_exists($bundle, 'preMethod')){
+						$ret = $bundle->preMethod();
 
-					$bundle = new ErrorController($format, $class, $cameFrom);
-
-					$action = '404';
-
-					callMethod($bundle, $cameFrom, '404', $payload);
-			}else {
-					header('HTTP/1.0 404 Not Found');
-			}
-			exit;
+						if($ret){
+							callMethod($bundle, $cameFrom, $action, $payload);
+							return;
+						}else {
+							call404($bundle, $cameFrom, $format, $class, $payload);
+						}
+				}else {
+					call404($bundle, $cameFrom, $format, $class, $payload);
+				}
 		}
 
+}
+function call404($bundle, $cameFrom, $format, $class, $payload){
+		$config = new Config();
+
+		if($config->environment['ERRORS']['404']){
+						$logger->trace('CALLING ERROR 404 LAST CHANCE');
+						require_once('core/app/controllers/error.php');
+
+						$bundle = new ErrorController($format, $class, $cameFrom);
+
+						$action = '404';
+
+						callMethod($bundle, $cameFrom, '404', $payload);
+		}else {
+						header('HTTP/1.0 404 Not Found');
+		}
+		exit;
 }
 function callMethod($bundle, $cameFrom, $action, $payload){
 			$bundle->actionName = $action;

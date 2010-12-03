@@ -12,9 +12,9 @@
 class CliController extends Controller {
 
    public function cli_build_models(
-				    PayloadPkg $name,
-				    PayloadPkg $core
-				   ){
+									PayloadPkg $name,
+									PayloadPkg $core
+									){
 
 		$dbLoader = new DbLoader();
 
@@ -27,8 +27,6 @@ class CliController extends Controller {
 		if($this->config->environment['DB'][$name->getString()]){
 			$db = $dbLoader->load($name->getString());
 
-			$db_name = $this->config->environment['DB'][$name->getString()]['db'];
-
 			$tables = $db->getTables();
 
 			if(!is_dir($coreModels.'app/models/'.$name->getString())){
@@ -39,27 +37,26 @@ class CliController extends Controller {
 			}
 
 			foreach($tables as $table){
-				$columns = $db->getTableData($table['Tables_in_'.$db_name]);
+				$columns = $db->getTableData($table['Tables_in_'.$name->getString()]);
 
 				$this->setReturnFormat('script');
 
-				$this->setViewData(array('dbType'    => $this->config->environment['DB'][$name->getString()]['type'],
-							 'columns'   => $columns, 
-							 'dbCfg'     => $name->getString(),
-							 'dbName'    => $db_name, 
-							 'tableName' => $table['Tables_in_'.$db_name],
-							 'table'     => $this->makeModelName($table['Tables_in_'.$db_name])));
+				$this->setViewData(array('dbType' => $this->config->environment['DB'][$name->getString()]['type'],
+										 'columns' => $columns, 
+										 'dbName' => $name->getString(), 
+										 'tableName' => $table['Tables_in_'.$name->getString()],
+										 'table' => $this->makeModelName($table['Tables_in_'.$name->getString()])));
 
 				$model  = $this->renderReturn('model');
 				$struct = $this->renderReturn('structure');
 
-				$completed .= "Building Model: ".$table['Tables_in_'.$db_name]."\n";
-				$this->logger->trace("Building Model: ".$table['Tables_in_'.$db_name]);
+				$completed .= "Building Model: ".$table['Tables_in_'.$name->getString()]."\n";
+				$this->logger->trace("Building Model: ".$table['Tables_in_'.$name->getString()]);
 
-				if(!is_file($coreModels.'app/models/'.$name->getString().'/'.$table['Tables_in_'.$db_name].'_model.php')){
-						file_put_contents($coreModels.'app/models/'.$name->getString().'/'.$table['Tables_in_'.$db_name].'_model.php', $model);
+				if(!is_file($coreModels.'app/models/'.$name->getString().'/'.$table['Tables_in_'.$name->getString()].'_model.php')){
+						file_put_contents($coreModels.'app/models/'.$name->getString().'/'.$table['Tables_in_'.$name->getString()].'_model.php', $model);
 				}
-				file_put_contents($coreModels.'app/models/'.$name->getString().'/structure/'.$table['Tables_in_'.$db_name].'_struct.php',$struct);
+				file_put_contents($coreModels.'app/models/'.$name->getString().'/structure/'.$table['Tables_in_'.$name->getString()].'_struct.php',$struct);
 			}
 		}else {
 			$completed = 'Name not in config.';

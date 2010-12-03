@@ -64,17 +64,11 @@ class PluginLoader {
 
 	$config = new Config();
 
-	$this->logger->debug("app/plugins/$plugin"."Plugin.php");
-
-	if(!class_exists('Plugin')){
-		require_once('core/Plugin.php');
-	}
-
-	if(is_file('app/plugins/'.$plugin.'Plugin.php')){
+	if(is_file('app/plugins/'.$plugin.'Plugin.php') && class_exists($plugin.'Plugin')){
 
 		require_once('app/plugins/'.$plugin.'Plugin.php');
 
-	}elseif(is_file('core/app/plugins/'.$plugin.'Plugin.php')){
+	}elseif(is_file('core/app/plugins/'.$plugin.'Plugin.php') && class_exists($plugin.'Plugin')){
 
 		require_once('core/app/plugins/'.$plugin.'Plugin.php');
 
@@ -83,19 +77,11 @@ class PluginLoader {
 
 		return;
 	}
+	$class = $plugin.'Plugin';
 
-	if(class_exists($plugin.'Plugin')){
-		$this->logger->debug("Loading Core Plugin");
-			$class = $plugin.'Plugin';
-			$pluginObj = new $class;
+	$pluginObj = new $class;
 
-			return $pluginObj;
-	}else {
-		$this->logger->error("Loading $plugin"."Plugin");
-
-		return;
-	}
-
+	return $pluginObj;
    }
 }
 ?>

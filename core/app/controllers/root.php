@@ -41,32 +41,41 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 class RootController extends Controller {
 
    public function web_index(PayloadPkg      $param,
-			     PayloadStackPkg $fb_sig,
-			     SessionDataPkg  $time,
-			     SessionDataPkg  $newtime){
+							 PayloadStackPkg $fb_sig,
+							 SessionDataPkg  $time,
+							 SessionDataPkg  $newtime){
 
-	$this->cacheControl();
+		$expires = 60*15;
+        header("Pragma: public");
+        header("Cache-Control: maxage=".$expires);
+        header('Expires: ' . gmdate('D, d M Y H:i:s', (time()+$expires)) . ' GMT');
+		header("Last-Modified: ". gmdate('D, d M Y H:i:s', time()) . " GMT");
 
 
-	if(!$time->getInt()){
-		$this->sessionData->setPkg('time',time());
-	}
-	if(!$newtime->getString()){
-		$this->sessionData->setPkg('newtime',date('Y-m-d H:i:s'));
-	}
+		//$this->sessionData->setPkg('time',time());
+		//$this->sessionData->setPkg('newtime',date('Y-m-d H:i:s'));
 
-	$params = array(
-			'test' => 'More Tests', 
-			'param' => $param->getString(), 
-			'time' => $time->getInt(), 
-			'newtime' => $newtime->getString()
-		);
-	foreach($fb_sig->getStack() as $index => $data){
-		$params[$index] = $data->getString();
-	}
-	$this->setViewData($params);
-	$this->render('example');
+		$params = array(
+				'test' => 'More Tests', 
+				'param' => $param->getString(), 
+				'time' => $time->getString(), 
+				'newtime' => $newtime->getString()
+			);
+		foreach($fb_sig->getStack() as $index => $data){
+			$params[$index] = $data->getString();
+		}
+		$this->setViewData($params);
+		$this->render('example');
    }
 
+   public function test(PayloadPkg $param){
+
+		$this->setViewData(array('test' => 'More Tests', 'param' => $param->getString()));
+		$this->render();
+   }
+
+   public function web_more_testing(){
+		$this->render('example');
+   }
 }
 ?>
