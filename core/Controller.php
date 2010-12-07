@@ -32,6 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @package FrameD
  */
 
+require_once('lib/Minify_HTML.php');
 
 /**
  * Controller Class
@@ -161,6 +162,9 @@ abstract class Controller{
 
 		if($this->format == '' || strtolower($this->format) == 'html' || strtolower($this->format) == 'php' && $view != NULL){
 
+		   if($this->config->application['SERVER']['minify_html'] == 'On'){
+		   		ob_start();
+		   }
 		   $logger = new Logger($view);
 		   if(is_file('app/views/html/'.$view.'.php')){
 
@@ -172,6 +176,16 @@ abstract class Controller{
 			   $this->logger->trace('LOADING CORE VIEW: '.$view);
 			   require('core/app/views/html/'.$view.'.php');
 
+		   }
+			
+		   if($this->config->application['SERVER']['minify_html'] == 'On'){
+				   $return = ob_get_contents();
+
+				   ob_end_clean();
+
+				   $minify = new Minify_HTML($return, array()); 
+
+				   echo $minify->process();
 		   }
 		} else {
 		    $logger = new Logger($view);
