@@ -24,9 +24,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 /**
- * Bin
+ * ApiBin
  * 
- * Basic Bin for FrameD
+ * Api Bin that allows generic Api access for FrameD
  * 
  * @author Adam Davidson <dark@gatevo.com>
  * @version 1.0
@@ -35,44 +35,33 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 /**
- * Bin Class
+ * ApiBin Class
  * 
  * @package FrameD
  * @subpackage core
  */
-abstract class Bin {
+class ApiBin extends Bin{
 
 /**
- * Database Obj
- *
+ * Load
+ *  
  * @access public
+ * @param  array  $data value
+ * @return array  db rows
  */
-   public $db;
+	public function load(
+						 PayloadPkg $columns,
+						 PayloadPkg $order,
+						 PayloadPkg $or,
+						 PayloadPkg $group,
+						 PayloadPkg $where,
+						 PayloadPkg $whereGreater,
+						 PayloadPkg $whereLess,
+						 PayloadPkg $whereGreaterEq,
+						 PayloadPkg $whereLessEq
+						){
 
-/**
- * Config Obj
- *
- * @access public
- */
-   public $config;
-
-
-/**
- * Bin Construct
- * 
- * @return void
- */
-   function __construct($binName, $payload, $sessionData){
-
-	  $this->binName = $binName;
-	
-	  $this->config = new Config();
-
-      $this->logger = new Logger($binName);
-
-	  $this->sessionData = $sessionData;
-
-	  $this->payload = $payload;
-   }
- }
+		
+	}
+}
 ?>

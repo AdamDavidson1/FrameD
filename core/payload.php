@@ -92,6 +92,14 @@ class PayloadPkg{
     * @var mixed
     */
     private $data;
+
+   /**
+    * Package Data From
+    * 
+    * @access private
+    * @var string
+    */
+    private $from;
    
 /**
  * PayloadPkg Construct
@@ -99,8 +107,9 @@ class PayloadPkg{
  * @param string $data Package data
  * @return void
  */
-    function __construct($data){
+    function __construct($data, $from=NULL){
 	  $this->data = $data;
+	  $this->from = $from;
     }
 
 /**
@@ -119,8 +128,10 @@ class PayloadPkg{
  * @access public
  * @return string
  */
-    public function getString(){
-	  return stripslashes($this->data);
+    public function getString($from='ANY'){
+	  if($from == 'ANY' || $this->from == $from){
+	  	return stripslashes($this->data);
+	  }
     }
 
 /**
@@ -129,12 +140,12 @@ class PayloadPkg{
  * @access public
  * @return int
  */
-    public function getInt($default=0){
-	if($this->data+0){
-	   return $this->data;
-	} else {
-	   return $default;
-	}
+    public function getInt($default=0, $from='ANY'){
+	   if($this->data+0 && ($from == 'ANY' || $this->from == $from)){
+	      return $this->data;
+	   } else {
+	      return $default;
+	   }
     }
 
 /**
@@ -143,12 +154,12 @@ class PayloadPkg{
  * @access public
  * @return float
  */
-    public function getFloat($default=0){
-	if($this->data+0){
-	   return $this->data;
-	} else {
-	   return $default;
-	}
+    public function getFloat($default=0, $from='ANY'){
+	   if($this->data+0 && ($from == 'ANY' || $this->from == $from)){
+	      return $this->data;
+	   } else {
+	      return $default;
+	   }
     }
 
 /**
@@ -158,9 +169,11 @@ class PayloadPkg{
  * @return array
  */
     public function getHash($delimiter=','){
-	return explode($delimiter, $this->data);
+	   return explode($delimiter, $this->data);
     }
 }
+
+
 
 /**
  * Payload Class
@@ -184,22 +197,22 @@ class Payload {
  * @return void
  */
     function __construct(){
-    $this->config = new Config();
-	$this->logger = new Logger('Payload');
+			$this->config = new Config();
+			$this->logger = new Logger('Payload');
 
-    foreach($_SERVER['argv'] as $index => $data){
-		if(substr_count($data,'--')){
-			$name = str_replace('--','',$data);
-			$this->data[$name] = new PayloadPkg($_SERVER['argv'][($index+1)]);
-		}
-	}
+			foreach($_SERVER['argv'] as $index => $data){
+				if(substr_count($data,'--')){
+					$name = str_replace('--','',$data);
+					$this->data[$name] = new PayloadPkg($_SERVER['argv'][($index+1)], 'CLI');
+				}
+			}
 
-	foreach($_POST as $index => $data){
-	   $this->data[$index] = new PayloadPkg($data);
-	}
-	foreach($_GET as $index => $data){
-	   $this->data[$index] = new PayloadPkg($data);
-	}
+			foreach($_POST as $index => $data){
+			   $this->data[$index] = new PayloadPkg($data, 'POST');
+			}
+			foreach($_GET as $index => $data){
+			   $this->data[$index] = new PayloadPkg($data, 'GET');
+			}
 
     }
 

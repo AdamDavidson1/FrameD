@@ -216,8 +216,22 @@ function callMethod($bundle, $cameFrom, $action, $payload){
 			$params = $method->getParameters();
 			$args = array();
 
+			$methodName = $method->getName();
+
 			foreach($params as $param){
-				$pkgClass     = $param->getClass()->getName();
+				$logger = new Logger('callMethod');
+
+				try{
+					$pkgClass     = $param->getClass();
+
+					if($pkgClass){
+						$pkgClass = $pkgClass->getName();
+					}
+				} catch(ReflectionException $e){
+					preg_match('/Class\s([A-Za-z0-9]+)/', $e->getMessage(), $match);
+
+					$pkgClass = $match[1];
+				}
 
 			    if($pkgClass == 'PayloadPkg'){
 					$args[] = $payload->getParam($param->name);
@@ -236,7 +250,7 @@ function callMethod($bundle, $cameFrom, $action, $payload){
 							require_once('core/BinLoader.php');
 							$binLoader = new BinLoader();
 					}
-					$args[] = $binLoader->load($pkgClass, $sessionData);
+					$args[] = $binLoader->load($pkgClass, $payload, $bundle->sessionData);
 				}
 			}
 

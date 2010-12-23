@@ -40,17 +40,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 class RootController extends Controller {
 
-   public function web_index(PayloadPkg      $param,
+   public function web_index(ApiBin			 $api,
+							 PayloadPkg      $param,
 							 PayloadStackPkg $fb_sig,
 							 SessionDataPkg  $time,
 							 SessionDataPkg  $newtime){
 
-		$expires = 60*15;
-        header("Pragma: public");
-        header("Cache-Control: maxage=".$expires);
-        header('Expires: ' . gmdate('D, d M Y H:i:s', (time()+$expires)) . ' GMT');
-		header("Last-Modified: ". gmdate('D, d M Y H:i:s', time()) . " GMT");
-
+		$this->cacheControl();
 
 		//$this->sessionData->setPkg('time',time());
 		//$this->sessionData->setPkg('newtime',date('Y-m-d H:i:s'));

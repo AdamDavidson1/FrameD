@@ -58,28 +58,87 @@ class BinLoader {
  * @access private
  * @return obj model object 
  */
-   public function load($bin, $sessionData){
+   public function load($bin, $payload, $sessionData){
 
-	$this->logger = new Logger('ModelLoader');
+	$binFile = strtolower(str_replace('Bin', '',$bin));
+
+	$this->logger = new Logger('BinLoader');
 
 	$config = new Config();
 
-	if(is_file('app/bins/'.$bin.'_bin.php')){
+	if(!class_exists('Bin')){
+		require_once('core/Bin.php');
+	}
 
-		require_once('app/bins/'.$bin.'_bin.php');
+	if(is_file('app/bins/'.$binFile.'.php')){
 
-	}elseif(is_file('core/app/bins/'.$bin.'_bin.php')){
+		require_once('app/bins/'.$binFile.'.php');
 
-		require_once('core/app/bins/'.$bin.'_bin.php');
+	}elseif(is_file('core/app/bins/'.$binFile.'.php')){
+
+		require_once('core/app/bins/'.$binFile.'.php');
 
 	}else {
-		$this->logger->error("Loading $bin Failed. No File Found");
+		$this->logger->error("Loading $binFile Failed. No File Found");
 
 		return;
 	}
-	$class = $bin.'Bin';
+	$class = $bin;
 
-	$binObj = new $class($bin, $sessionData);
+	$binObj = new $class($bin, $payload, $sessionData);
+
+	if(!method_exists($binObj, 'load')){
+		$this->logger->error("Loading $bin Failed. Load Method Not Defined");
+
+		return;
+	}
+
+	$method = new ReflectionMethod($binObj,'load');
+
+    $params = $method->getParameters();
+    $args = array();
+
+	$this->logger->debug(print_r($params,1));
+
+	foreach($params as $param){
+		try{
+			$pkgClass     = $param->getClass();
+
+			if($pkgClass){
+				$pkgClass = $pkgClass->getName();
+			}
+		} catch(ReflectionException $e){
+			preg_match('/Class\s([A-Za-z0-9]+)/', $e->getMessage(), $match);
+
+			$pkgClass = $match[1];
+		}
+
+		$this->logger->debug($pkgClass);
+
+		if($pkgClass == 'PayloadPkg'){
+			$args[] = $payload->getParam($param->name);
+
+			$this->logger->debug(print_r($payload,1));
+		}
+		if($pkgClass == 'SessionDataPkg'){
+			$args[] = $bundle->sessionData->getPkg($param->name);
+		}
+		if($pkgClass == 'PayloadStackPkg'){
+			$args[] = $payload->getStack($param->name);
+		}
+		if(strstr($pkgClass,'Bin')){
+			if((!$binLoader) || (!class_exists('BinLoader'))){
+					/**
+					 * FrameD BinLoader
+					 */
+					require_once('core/BinLoader.php');
+					$binLoader = new BinLoader();
+			}
+			$args[] = $binLoader->load($pkgClass, $payload, $bundle->sessionData);
+		}
+	}
+
+    $method->invokeArgs($binObj,$args);
 
 	return $binObj;
    }
