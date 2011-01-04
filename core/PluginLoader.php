@@ -64,18 +64,23 @@ class PluginLoader {
 
 	$config = new Config();
 
-	if(is_file('app/plugins/'.$plugin.'Plugin.php') && class_exists($plugin.'Plugin')){
+	if(is_file('app/plugins/'.$plugin.'.php')){
 
-		require_once('app/plugins/'.$plugin.'Plugin.php');
+		require_once('app/plugins/'.$plugin.'.php');
 
-	}elseif(is_file('core/app/plugins/'.$plugin.'Plugin.php') && class_exists($plugin.'Plugin')){
+	}elseif(is_file('core/app/plugins/'.$plugin.'.php')){
 
-		require_once('core/app/plugins/'.$plugin.'Plugin.php');
+		require_once('core/app/plugins/'.$plugin.'.php');
 
 	}else {
 		$this->logger->error("Loading $plugin.");
 
 		return;
+	}
+	if(!class_exists($plugin.'Plugin')){
+		$this->logger->error("Loading $plugin.");
+
+        return;
 	}
 	$class = $plugin.'Plugin';
 

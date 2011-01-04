@@ -51,8 +51,11 @@ final class Config{
    function __construct(){
 		$this->declared = false;
 
-		$this->environment = $this->parseIni('config/environment.ini');
-		$this->application = $this->parseIni('config/application.ini');
+		$default_environment = $this->parseIni('config/default_environment.ini');
+		$default_application = $this->parseIni('config/default_application.ini');
+
+		$this->environment = array_merge($this->parseIni('config/environment.ini', $default_environment);
+		$this->application = array_merge($this->parseIni('config/application.ini'), $default_application);
    }
 
    private function parseIni($array){
