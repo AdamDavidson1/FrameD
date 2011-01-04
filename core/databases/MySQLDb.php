@@ -157,7 +157,15 @@ class MySQLDb {
 	if($ret){
 	   return $this->db->insert_id;
 	} else {
-	   $this->logger->error($this->db->errno().' : '.print_r($this->db->error(),1));
+	   try{
+		  if(method_exists('errno', $this->db)){
+	      	$this->logger->error($this->db->errno().' : '.print_r($this->db->error(),1));
+		  }else {
+			$this->logger->error('Connect Error');
+		  }
+	   } catch(Exception $e) {
+		  $this->logger->error('MySQL Connection Error '.$e->getMessage());
+	   }
 	   return;
 	}
    }

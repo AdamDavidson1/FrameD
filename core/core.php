@@ -112,8 +112,6 @@ function loadFramework($cameFrom, $controller, $action, $format){
 		$config = new Config();
 		$logger = new Logger('Core');
 
-		$logger->debug("$controller / $action.$format");
-
 		if(is_file('app/controllers/'.$controller.'.php')){
 
 			require_once('app/controllers/'.$controller.'.php');
@@ -256,10 +254,7 @@ function callMethod($bundle, $cameFrom, $action, $payload){
 
 			$logger = new Logger('Core CallMethod');
 
-			$logger->debug('CALLING '.$cameFrom.'_'.$action);
-
 			$method->invokeArgs($bundle,$args);
-			$logger->debug('CALLED '.$action);
 
 			return;
 }

@@ -98,8 +98,6 @@ class BinLoader {
     $params = $method->getParameters();
     $args = array();
 
-	$this->logger->debug(print_r($params,1));
-
 	foreach($params as $param){
 		try{
 			$pkgClass     = $param->getClass();
@@ -113,12 +111,8 @@ class BinLoader {
 			$pkgClass = $match[1];
 		}
 
-		$this->logger->debug($pkgClass);
-
 		if($pkgClass == 'PayloadPkg'){
 			$args[] = $payload->getParam($param->name);
-
-			$this->logger->debug(print_r($payload,1));
 		}
 		if($pkgClass == 'SessionDataPkg'){
 			$args[] = $bundle->sessionData->getPkg($param->name);

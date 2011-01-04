@@ -70,6 +70,8 @@ abstract class Bin {
 
       $this->logger = new Logger($binName);
 
+	  $this->pluginLoader = new PluginLoader();
+
 	  $this->sessionData = $sessionData;
 
 	  $this->payload = $payload;

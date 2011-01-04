@@ -271,8 +271,9 @@ class SessionData {
 	  $cleartext = $bf->decrypt($data);
 
 	  if(extension_loaded('zlib') && $this->config->environment['SESSIONDATA']['cookie']['compress']){
-		$data = gzuncompress($data);
+		$cleartext = gzinflate($cleartext);
 	  }
+
 
 	  return $cleartext;
    }
@@ -296,12 +297,16 @@ class SessionData {
 
 		 $bf->setKey($key, $iv);
 
+	     if(extension_loaded('zlib') && $this->config->environment['SESSIONDATA']['cookie']['compress']){
+		   $originalData = $data;
+		   $data = gzdeflate($data, $this->config->environment['SESSIONDATA']['cookie']['compress_level'] ? 
+									      $this->config->environment['SESSIONDATA']['cookie']['compress_level'] : 1);
+		   $this->logger->trace('Compression: '.strlen($data).' '.strlen($originalData));
+			
+	     }
+
 		 $crypttext = $bf->encrypt($data);
 
-	  if(extension_loaded('zlib') && $this->config->environment['SESSIONDATA']['cookie']['compress']){
-		$crypttext = gzcompress($crypttext, $this->config->environment['SESSIONDATA']['cookie']['compress_level'] ? 
-											$this->config->environment['SESSIONDATA']['cookie']['compress_level'] : 1);
-	  }
 
 	  return $crypttext;
    }

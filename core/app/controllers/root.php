@@ -48,8 +48,12 @@ class RootController extends Controller {
 
 		$this->cacheControl();
 
-		//$this->sessionData->setPkg('time',time());
-		//$this->sessionData->setPkg('newtime',date('Y-m-d H:i:s'));
+		if(!$time->getInt()){
+			$this->sessionData->setPkg('time',time());
+		}
+		if(!$newtime->getString()){
+			$this->sessionData->setPkg('newtime',date('Y-m-d H:i:s'));
+		}
 
 		$params = array(
 				'test' => 'More Tests', 
