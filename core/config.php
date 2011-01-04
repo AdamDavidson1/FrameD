@@ -54,7 +54,7 @@ final class Config{
 		$default_environment = $this->parseIni('config/default_environment.ini');
 		$default_application = $this->parseIni('config/default_application.ini');
 
-		$this->environment = array_merge($this->parseIni('config/environment.ini', $default_environment);
+		$this->environment = array_merge($this->parseIni('config/environment.ini'), $default_environment);
 		$this->application = array_merge($this->parseIni('config/application.ini'), $default_application);
    }
 
