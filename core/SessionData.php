@@ -80,7 +80,12 @@ class SessionDataPkg {
  * @return mixed
  */
     public function getJSON(){
-	  return json_decode(stripslashes($this->data));
+	  if(!class_exists('Services_JSON')){
+                require_once('JSON.php');
+      }
+      $json = new Services_JSON();
+
+	  return $json->decode(stripslashes($this->data));
     }
 
 /**
@@ -321,7 +326,11 @@ class SessionData {
  * @return string json encoded string
  */
    private function serialize($data){
-	  return json_encode($data);
+	  if(!class_exists('Services_JSON')){
+                require_once('JSON.php');
+      }
+      $json = new Services_JSON();
+	  return $json->encode($data);
    }
 
 /**
@@ -334,7 +343,11 @@ class SessionData {
  * @return mixed   data
  */
    private function deserialize($data){
-	  return json_decode(trim($data));
+	  if(!class_exists('Services_JSON')){
+                require_once('JSON.php');
+      }
+      $json = new Services_JSON();
+	  return $json->decode(trim($data));
    }
 
 /**

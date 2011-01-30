@@ -318,7 +318,7 @@ abstract class Controller{
  * @return string  JSON
  */
     private function writeJSON($data){
-		if(!class_exists('XML_Serializer')){
+		if(!class_exists('Services_JSON')){
                 require_once('JSON.php');
         }
 		$json = new Services_JSON();

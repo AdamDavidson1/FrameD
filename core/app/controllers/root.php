@@ -57,7 +57,7 @@ class RootController extends Controller {
 
 		$params = array(
 				'test' => 'More Tests', 
-				'param' => $param->getString(), 
+				'param' => $param->getInt(), 
 				'time' => $time->getString(), 
 				'newtime' => $newtime->getString()
 			);
