@@ -31,7 +31,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @version 1.0
  * @package FrameD
  */
-
 date_default_timezone_set('America/Los_Angeles');
 
 ini_set('display_errors',false);
@@ -90,7 +89,6 @@ require_once('core/ModelLoader.php');
  * FrameD PluginLoader
  */
 require_once('core/PluginLoader.php');
-
 
  /**
   * Get File Name
@@ -292,6 +290,8 @@ $config = new Config();
 $logger = new Logger('Core');
 $payload = new Payload();
 
+date_default_timezone_set($config->environment['SERVER']['timezone']);
+
 $format = $payload->getParam('format')->getString();
 
 $action = $payload->getParam('action')->getString();
@@ -323,5 +323,4 @@ if(!$action){
 	$logger->trace('LOADING DEFAULT ACTION: '.$action);
 
 }
-
 ?>

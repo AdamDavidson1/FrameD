@@ -75,6 +75,14 @@ abstract class Controller{
     public $logger;
 
    /**
+    * Config Loader Object
+    * 
+    * @access public
+    * @var ConfigLoader Object
+    */
+    public $configLoader;
+
+   /**
     * Session Data
     * 
     * @access public
@@ -95,6 +103,7 @@ abstract class Controller{
 		$this->logger = new Logger($class);
 		$this->config = new Config();
 		$this->dbLoader = new DbLoader();
+		$this->configLoader = new ConfigLoader();
     }
 
 /**
@@ -135,6 +144,26 @@ abstract class Controller{
                 return;
         }
 
+/**
+ * Set Response Header
+ * 
+ * @access public
+ * @return void
+ */
+	public function setResponseHeader($httpCode = 200){
+		$this->httpCode = $httpCode;
+	}
+
+/**
+ * Call Response Header
+ * 
+ * @access private
+ * @return void
+ */
+	private function callResponseHeader(){
+		$httpCodeConfig = $this->configLoader->load('core_httpcodes');
+		header('HTTP/1.0 ' . $httpCodeConfig['HTTPCODE'][$this->httpCode]);
+	}
 
 /**
  * Render
@@ -159,6 +188,7 @@ abstract class Controller{
 				 );
 		}
 
+		$this->callResponseHeader();
 
 		if($this->format == '' || strtolower($this->format) == 'html' || strtolower($this->format) == 'php' && $view != NULL){
 
@@ -351,7 +381,7 @@ abstract class Controller{
 		   );
 		 
 			$serializer = new XML_Serializer($options);
-    		return '<?xml version="1.0" encoding="UTF-8"?>'."\n".$serializer->serialize($array);
+    		return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"."\n".$serializer->serialize($array);
 	}
 }
 ?>

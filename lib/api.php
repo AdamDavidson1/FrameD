@@ -42,4 +42,11 @@ $cameFrom = 'web';
 require_once('core/core.php');
 
 loadFramework($cameFrom, $controller, $action, $format);
+
+$end = explode(' ', microtime());
+$end =  (float)$end[1] + $end[0];
+
+$took = $end - $start;
+
+$logger->debug('Took: '.$took.' ms');
 ?>
