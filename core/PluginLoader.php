@@ -68,13 +68,13 @@ class PluginLoader {
 		require_once('core/Plugin.php');
 	}
 
-	if(is_file('app/plugins/'.$plugin.'.php')){
+	if(is_file('app/plugins/'.$plugin.'_plugin.php')){
 
-		require_once('app/plugins/'.$plugin.'.php');
+		require_once('app/plugins/'.$plugin.'_plugin.php');
 
-	}elseif(is_file('core/app/plugins/'.$plugin.'.php')){
+	}elseif(is_file('core/app/plugins/'.$plugin.'_plugin.php')){
 
-		require_once('core/app/plugins/'.$plugin.'.php');
+		require_once('core/app/plugins/'.$plugin.'_plugin.php');
 
 	}else {
 		$this->logger->error("Failed to Find $plugin in app/plugins/ and core/app/plugins/");
@@ -82,7 +82,7 @@ class PluginLoader {
 
 		return;
 	}
-	if(!class_exists($plugin)){
+	if(!class_exists($plugin.'Plugin')){
 		$this->logger->error("Loading $plugin.");
 
         return;
