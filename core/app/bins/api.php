@@ -61,6 +61,16 @@ class ApiBin extends Bin{
 						 PayloadPkg $whereLessEq
 						){
 
+
+		$this->columns = $columns->getHash(',');
+		$this->order = $order->getHash(',');
+		$this->or = $or->getHash(',');
+		$this->group = $group->getHash(',');
+		$this->where = $where->getHash(',');
+		$this->whereGreater = $whereGreater->getHash(',');
+		$this->whereLess = $whereLess->getHash(',');
+		$this->whereGreaterEq = $whereGreaterEq->getHash(',');
+		$this->whereLessEq = $whereLessEq->getHash(',');
 		
 	}
 }
