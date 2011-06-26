@@ -188,12 +188,13 @@ class MySQLDb {
  * SmartSelect
  * 
  * @access public
- * @param string $table   Table name on which you want to query
- * @param array  $select  names of columns you wish to query
- * @param array  $where   key/value pair where value is the column value and the key is the column name
+ * @param string $table     Table name on which you want to query
+ * @param array  $select    names of columns you wish to query
+ * @param array  $where     key/value pair where value is the column value and the key is the column name
+ * @param array  $addendum  additional items for query
  * @return array db rows
  */
-   public function smartSelect($table, $select, $where){
+   public function smartSelect($table, $select, $where, $addendum=null){
 	
     if($select){
 	   $dbSelect = $this->prepareColumns($select, ',', $table);
@@ -213,13 +214,43 @@ class MySQLDb {
         if (substr($key,-1)=='!') {
           $key = substr($key,0,strlen($key)-1);
           $wheresql .= $key . ' <> ' . $val;
-        } else {
+        }elseif(substr($key,-1)=='>'){
+          $key = substr($key,0,strlen($key)-1);
+          $wheresql .= $key . ' > ' . $val;
+		}elseif(substr($key,-1)=='<'){
+          $key = substr($key,0,strlen($key)-1);
+          $wheresql .= $key . ' < ' . $val;
+		}elseif(substr($key,-2)=='>='){
+          $key = substr($key,0,strlen($key)-2);
+          $wheresql .= $key . ' >= ' . $val;
+		}elseif(substr($key,-2)=='<='){
+          $key = substr($key,0,strlen($key)-2);
+          $wheresql .= $key . ' <= ' . $val;
+		}else {
           $wheresql .= $key . '=' . $val;
         }
       }
 
       $sql .= $wheresql;
     }
+
+	if($addendum){
+		if(is_array($addendum)){
+			if($addendum['group']){
+				$sql .= ' GROUP BY '.implode(','$addendum['group']);
+			}
+			if($addendum['order']){
+				$sql .= ' ORDER BY ';
+				foreach($addendum['order'] as $index => $item){
+					$order[] = $index.' '.$item;
+				}
+				$sql .= implode(',',$order);
+				unset($order);
+			}
+		}else {
+			$sql .= ' '.$addendum;
+		}
+	}
 
 	$sql .= ';';
 

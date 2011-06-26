@@ -46,25 +46,35 @@ class ApiBin extends Bin{
  * Load
  *  
  * @access public
- * @param  array  $data value
+ * @param  string $columns        Columns for Selection
+ * @param  string $order          Order of Selection
+ * @param  string $group          Grouping for Selection
+ * @param  string $where          Where for Selection
+ * @param  string $whereGreater   Where Greater for Selection
+ * @param  string $whereLess      Where Less than for Selection
+ * @param  string $whereGreaterEq Where Greater Equal to for Selection
+ * @param  string $whereLessEq    Where Less than or Equal to for Selection
+ * @param  string $or             Where Or for Selection
  * @return array  db rows
  */
 	public function load(
 						 PayloadPkg $columns,
 						 PayloadPkg $order,
-						 PayloadPkg $or,
 						 PayloadPkg $group,
 						 PayloadPkg $where,
 						 PayloadPkg $whereGreater,
 						 PayloadPkg $whereLess,
 						 PayloadPkg $whereGreaterEq,
-						 PayloadPkg $whereLessEq
+						 PayloadPkg $whereLessEq,
+						 PayloadPkg $or,
+						 PayloadPkg $not
 						){
 
 
 		$this->columns = $columns->getHash(',');
 		$this->order = $order->getHash(',');
 		$this->or = $or->getHash(',');
+		$this->not = $not->getHash(',');
 		$this->group = $group->getHash(',');
 		$this->where = $where->getHash(',');
 		$this->whereGreater = $whereGreater->getHash(',');
@@ -73,5 +83,34 @@ class ApiBin extends Bin{
 		$this->whereLessEq = $whereLessEq->getHash(',');
 		
 	}
+
+	public function getData($modelName, $package){
+		$model = $this->modelLoader($modelName,$package);
+
+		foreach($this->whereGreater as $index => $whereGreater){
+			$this->where[$index.'>'] = $whereGreater;
+		}
+		foreach($this->whereLess as $index => $whereLess){
+			$this->where[$index.'<'] = $whereLess;
+		}
+		foreach($this->whereGreaterEq as $index => $whereGreaterEq){
+			$this->where[$index.'>='] = $whereGreaterEq;
+		}
+		foreach($this->whereLessEq as $index => $whereLessEq){
+			$this->where[$index.'<='] = $whereLessEq;
+		}
+		foreach($this->not as $index => $not){
+			$this->where[$index.'!'] = $not;
+		}
+
+		if($this->group){
+			$addendum['group'] = $this->group;
+		}
+		if($this->order){
+			$addendum['order'] = $this->order;
+		}
+
+		return $model->smartSelect($this->columns, $this->where, $addendum);
+    }
 }
 ?>
