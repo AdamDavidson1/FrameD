@@ -48,6 +48,8 @@ class RootController extends Controller {
 
 		$this->cacheControl();
 
+		$this->logger->debug(print_r($_REQUEST,1));
+
 		if(!$time->getInt()){
 			$this->sessionData->setPkg('time',time());
 		}
@@ -59,6 +61,7 @@ class RootController extends Controller {
 				'test' => 'More Tests', 
 				'param' => $param->getInt(), 
 				'time' => $time->getString(), 
+				'where' => $api->where,
 				'newtime' => $newtime->getString()
 			);
 		foreach($fb_sig->getStack() as $index => $data){

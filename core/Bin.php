@@ -43,11 +43,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 abstract class Bin {
 
 /**
- * Database Obj
+ * Logger Obj
  *
  * @access public
  */
-   public $db;
+   public $logger;
 
 /**
  * Config Obj
@@ -56,6 +56,33 @@ abstract class Bin {
  */
    public $config;
 
+/**
+ * Plugin Loader Obj
+ *
+ * @access public
+ */
+   public $pluginLoader;
+
+/**
+ * Model Loader Obj
+ *
+ * @access public
+ */
+   public $modelLoader;
+
+/**
+ * Session Data Obj
+ *
+ * @access public
+ */
+   public $sessionData;
+
+/**
+ * Payload Obj
+ *
+ * @access public
+ */
+   public $payload;
 
 /**
  * Bin Construct
@@ -71,6 +98,8 @@ abstract class Bin {
       $this->logger = new Logger($binName);
 
 	  $this->pluginLoader = new PluginLoader();
+
+	  $this->modelLoader = new ModelLoader();
 
 	  $this->sessionData = $sessionData;
 
