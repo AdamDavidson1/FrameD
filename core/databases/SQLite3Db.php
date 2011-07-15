@@ -51,7 +51,7 @@ class SQLite3Db {
    function __construct($db){
 	$this->config = new Config();
 	
-	$this->db_name = $this->config->environment['DB'][$db]['db'];
+	$this->db_name = $db;
 	$this->db_file = $this->config->environment['DB'][$db]['file'];
 
     $this->logger = new Logger('SQLite3DB');
@@ -163,14 +163,14 @@ class SQLite3Db {
  */
    public function smartSelect($table, $select, $where){
     if($select){
-	   $dbSelect = $this->prepareColumns($select, ',');
+	   $dbSelect = $this->prepareColumns($select, ',', $table);
 	} else {
 	   $dbSelect = "* ";
 	}
 
 	$sql .= 'SELECT '.$dbSelect.' FROM '.$table;
 
-	$dbWhere = $this->prepare($table, $where);
+	$dbWhere = $this->prepare($where, $table);
 
 	 if (count($dbwhere) > 0) {
       $sql .= ' WHERE ';
@@ -302,6 +302,8 @@ class SQLite3Db {
  * @return string delimited string
  */
    private function prepareColumns($data, $delimiter=',',$table){
+
+	$this->logger->debug('prepareColumns: '.print_r($table,1));
       $dbInfo = $this->getTableData($table);
 	  foreach($data as $column){
 		foreach($dbInfo as $info){
@@ -333,10 +335,14 @@ class SQLite3Db {
  * @return array striped and cleaned data for query
  */
    private function prepare($array, $table){
+	$this->logger->debug('prepare: '.print_r($table,1));
     $dbInfo = $this->getTableData($table);
 	if(!$dbInfo){
 		$this->logger->error('Table '.$table.' does not exist');
 		return;
+	}
+	if(!is_array($array)){
+		return false;
 	}
     foreach($array as $index => $data){
        foreach($dbInfo as $info){
@@ -373,6 +379,8 @@ class SQLite3Db {
  */
    public function getTableData($table){
 
+	  $this->logger->debug(print_r($table,1));
+
       if(!$this->$table){
 		 $this->$table = $this->query('PRAGMA table_info('.$table.');');
       }
@@ -400,7 +408,8 @@ class SQLite3Db {
  * @return string delimited string
  */
    private function prepareData($array, $table, $delimiter){
-	$dbInfo = $this->getTableData();
+	$this->logger->debug('prepareData: '.print_r($table,1));
+	$dbInfo = $this->getTableData($table);
 	if(!$dbInfo){
 		$this->logger->error('Table '.$table.' does not exist');
 		return;

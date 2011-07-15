@@ -61,7 +61,7 @@ class RootController extends Controller {
 				'test' => 'More Tests', 
 				'param' => $param->getInt(), 
 				'time' => $time->getString(), 
-				'where' => $api->where,
+				'where' => $api->getData('User','framed'),
 				'newtime' => $newtime->getString()
 			);
 		foreach($fb_sig->getStack() as $index => $data){
