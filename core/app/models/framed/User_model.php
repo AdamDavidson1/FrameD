@@ -10,7 +10,7 @@
 /**
  * User Structure
  */
-require_once("app/models/framed/structure/User_struct.php");
+require_once("core/app/models/framed/structure/User_struct.php");
 
 /**
  * UserModel Class

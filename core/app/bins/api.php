@@ -85,7 +85,7 @@ class ApiBin extends Bin{
 	}
 
 	public function getData($modelName, $package){
-		$model = $this->modelLoader($modelName,$package);
+		$model = $this->modelLoader->load($modelName,$package);
 
 		foreach($this->whereGreater as $index => $whereGreater){
 			$this->where[$index.'>'] = $whereGreater;
@@ -108,6 +108,10 @@ class ApiBin extends Bin{
 		}
 		if($this->order){
 			$addendum['order'] = $this->order;
+		}
+
+		if(!$this->columns){
+			$this->columns = null;
 		}
 
 		return $model->smartSelect($this->columns, $this->where, $addendum);
