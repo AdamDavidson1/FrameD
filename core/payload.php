@@ -169,19 +169,23 @@ class PayloadPkg{
  * @return array
  */
     public function getHash($delimiter=','){
-	   $data = explode($delimiter, $this->data);
+	   if($this->data){
+			   $data = explode($delimiter, $this->data);
 
-	   if(strstr('=',$this->data)){
-			   foreach($data as $item){
-				  $parts = explode('=',$item);
-				  $ret[$parts[0]] = $parts[1];
+			   if(strstr('=',$this->data)){
+					   foreach($data as $item){
+						  $parts = explode('=',$item);
+						  $ret[$parts[0]] = $parts[1];
+					   }
+			   }else {
+				$ret = $data;
 			   }
-	   }else {
-		$ret = $data;
+			   unset($parts);
+			   unset($data);
+			   return $ret;
+	   } else {
+			   return false;
 	   }
-	   unset($parts);
-       unset($data);
-	   return $ret;
     }
 
 /**
