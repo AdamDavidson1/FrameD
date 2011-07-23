@@ -237,7 +237,7 @@ class MySQLDb {
 	if($addendum){
 		if(is_array($addendum)){
 			if($addendum['group']){
-				$sql .= ' GROUP BY '.implode(','$addendum['group']);
+				$sql .= ' GROUP BY '.implode(',', $addendum['group']);
 			}
 			if($addendum['order']){
 				$sql .= ' ORDER BY ';
@@ -246,6 +246,9 @@ class MySQLDb {
 				}
 				$sql .= implode(',',$order);
 				unset($order);
+			}
+			if($addendum['limit']){
+				$sql .= ' LIMIT '.$addendum['limit'][0].($addendum['limit'][1] ? ', '.$addendum['limit'][1] : '');
 			}
 		}else {
 			$sql .= ' '.$addendum;
@@ -269,35 +272,8 @@ class MySQLDb {
  * @return array db rows
  */
    public function smartSelectOne($table, $select, $where){
-    if($select){
-	   $dbSelect = $this->prepareColumns($select, ',', $table);
-	} else {
-	   $dbSelect = "* ";
-	}
 
-	$sql .= 'SELECT '.$dbSelect.' FROM '.$table;
-
-	$dbwhere = $this->prepare($where, $table);
-
-	 if (count($dbwhere) > 0) {
-      $sql .= ' WHERE ';
-
-      foreach ($dbwhere as $key => $val) {
-        if ($wheresql) { $wheresql .= ' AND '; }
-        if (substr($key,-1)=='!') {
-          $key = substr($key,0,strlen($key)-1);
-          $wheresql .= $key . ' <> ' . $val;
-        } else {
-          $wheresql .= $key . '=' . $val;
-        }
-      }
-
-      $sql .= $wheresql;
-    }
-
-	$sql .= ' LIMIT 1;';
-
-	$ret = $this->query($sql);
+	$ret = $this->smartSelect($table, $select, $where, ' LIMIT 1');
 
     return $ret[0];
 
