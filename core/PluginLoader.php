@@ -64,17 +64,20 @@ class PluginLoader {
 
 	$config = new Config();
 
+	$pluginFile = strtolower($plugin);
+	$plugin = ucfirst(strtolower($plugin));
+
 	if(!class_exists('Plugin')){
 		require_once('core/Plugin.php');
 	}
 
-	if(is_file('app/plugins/'.$plugin.'_plugin.php')){
+	if(is_file('app/plugins/'.$pluginFile.'_plugin.php')){
 
-		require_once('app/plugins/'.$plugin.'_plugin.php');
+		require_once('app/plugins/'.$pluginFile.'_plugin.php');
 
-	}elseif(is_file('core/app/plugins/'.$plugin.'_plugin.php')){
+	}elseif(is_file('core/app/plugins/'.$pluginFile.'_plugin.php')){
 
-		require_once('core/app/plugins/'.$plugin.'_plugin.php');
+		require_once('core/app/plugins/'.$pluginFile.'_plugin.php');
 
 	}else {
 		$this->logger->error("Failed to Find $plugin in app/plugins/ and core/app/plugins/");
