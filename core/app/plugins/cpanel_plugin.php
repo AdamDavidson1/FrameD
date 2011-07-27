@@ -90,17 +90,80 @@ class CpanelPlugin extends Plugin{
 	function __construct(){
 		parent::__construct();
 	}
+
+
+/**
+ * Get Data
+ * 
+ * @access public
+ * @return object
+ */
+	public function getDNSZones(){
+		return $this->getData('listzones');
+	}
+
 /**
  * Get Data
  * 
  * @access private
  * @return object
  */
-	private function getData($function){
+	private function getData($function, $params = null){
 		$this->getConfig();
 
 		$url = $this->ssl ? 'https://' : 'http://';
-		$url = $this->domain.':'.$this->port.'/json-api/'.$function
+		$url .= $this->domain.':'.$this->port.'/json-api/'.$function;
+
+		if($params && is_array($params)){
+			$url .= '?'.http_build_query($params);
+		}
+
+		$ch = curl_init();
+
+		$this->logger->debug($url);
+
+		// set URL and other appropriate options
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_HEADER, 0);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,0);	
+		# Allow self-signed certs
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,0);
+		if($this->hash){
+			$header[0] = "Authorization: WHM ".$this->user.":" . preg_replace("'(\r|\n)'","",$this->hash);
+		} else {
+			$header[0] = "Authorization: Basic " . base64_encode($this->user.":".$this->pass) . "\n\r";
+		}
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $header);  
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+		// grab URL and pass it to the browser
+		$ret = curl_exec($ch);
+
+		$this->logger->debug('CPANEL getData: '.print_r($ret,1));
+
+		$ret = json_decode($ret);
+
+		// close cURL resource, and free up system resources
+		curl_close($ch);
+
+		return $ret;
+	}
+
+/**
+ * Add Item
+ * 
+ * @access private
+ * @param string $function
+ * @param array  $params 
+ * @return object
+ */
+	private function addItem($function, $params){
+		$this->getConfig();
+
+		$query = http_build_query($params);
+
+		$url = $this->ssl ? 'https://' : 'http://';
+		$url = $this->domain.':'.$this->port.'/json-api/'.$function.'?'.$query;
 
 		$ch = curl_init();
 
@@ -123,7 +186,14 @@ class CpanelPlugin extends Plugin{
 
 		// close cURL resource, and free up system resources
 		curl_close($ch);
+
+		if($ret->result->status == 1){
+			return true;
+		}else {
+			return false;
+		}
 	}
+
 
 /**
  * Get Config
