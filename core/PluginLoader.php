@@ -90,7 +90,7 @@ class PluginLoader {
 
         return;
 	}
-	$class = $plugin;
+	$class = $plugin.'Plugin';
 
 	$pluginObj = new $class;
 
