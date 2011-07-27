@@ -46,7 +46,7 @@ class RootController extends Controller {
 							 SessionDataPkg  $time,
 							 SessionDataPkg  $newtime){
 
-		$this->cacheControl();
+		//$this->cacheControl();
 
 		$this->logger->debug(print_r($_REQUEST,1));
 
@@ -57,11 +57,16 @@ class RootController extends Controller {
 			$this->sessionData->setPkg('newtime',date('Y-m-d H:i:s'));
 		}
 
+		$cpanelPlugin = $this->pluginLoader->load('Cpanel');
+
+		$cpanelPlugin->setPackage('GATEVO');
+
 		$params = array(
 				'test' => 'More Tests', 
 				'param' => $param->getInt(), 
 				'time' => $time->getString(), 
 				'where' => $api->getData('User','framed'),
+				'CpanelApi' => $cpanelPlugin->getDNSZones(),
 				'newtime' => $newtime->getString()
 			);
 		foreach($fb_sig->getStack() as $index => $data){
