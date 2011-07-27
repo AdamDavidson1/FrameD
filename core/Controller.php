@@ -90,6 +90,14 @@ abstract class Controller{
     */
     public $sessionData;
 
+	/**
+    * Plugin Loader
+    * 
+    * @access public
+    * @var mixed
+    */
+	public $pluginLoader;
+
 /**
  * Controller Construct
  * 
@@ -104,6 +112,7 @@ abstract class Controller{
 		$this->config = new Config();
 		$this->dbLoader = new DbLoader();
 		$this->configLoader = new ConfigLoader();
+		$this->pluginLoader = new PluginLoader();
     }
 
 /**
