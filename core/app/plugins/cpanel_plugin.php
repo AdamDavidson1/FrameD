@@ -102,6 +102,39 @@ class CpanelPlugin extends Plugin{
 		return $this->getData('listzones');
 	}
 
+    public function getZoneRecord($domain, $line=1){
+		$ret = $this->dumpZone();
+
+		foreach($ret->result[0]->record as $record){
+			if($record->name == $domain.'.'.$this->domain.'.'){
+				return $record;
+			}
+		}
+	}
+
+    public function dumpZone(){
+		return $this->getData('dumpzone', array('domain' => $this->domain));
+    }
+/**
+ * Get Data
+ * 
+ * @access public
+ * @return object
+ */
+	public function addZoneRecord($name, $type, $class, $address=null){
+
+		if(!$address){
+			$address = gethostbyname($this->domain);
+		}
+		return $this->addItem('addzonerecord', array(
+													'zone' => $this->domain,
+													'name' => $name,
+													'address' => $address,
+													'type' => $type,
+													'class' => $class
+							  ));
+ 	}
+
 /**
  * Get Data
  * 
@@ -220,5 +253,6 @@ class CpanelPlugin extends Plugin{
  */
 	public function setPackage($package){
 		$this->package = $package;
+		$this->getConfig();
 	}
 }
