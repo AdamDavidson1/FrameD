@@ -275,7 +275,7 @@ function callMethod($bundle, $cameFrom, $action, $payload){
 							require_once('core/BinLoader.php');
 							$binLoader = new BinLoader();
 					}
-					$args[] = $binLoader->load($pkgClass, $payload, $bundle->sessionData);
+					$args[] = $binLoader->load($pkgClass, $payload, $bundle->sessionData, $bundle);
 				}
 			}
 
