@@ -85,11 +85,18 @@ abstract class Bin {
    public $payload;
 
 /**
+ * Controller Obj
+ *
+ * @access public
+ */
+   public $controller;
+
+/**
  * Bin Construct
  * 
  * @return void
  */
-   function __construct($binName, $payload, $sessionData){
+   function __construct($binName, $payload, $sessionData, $controller){
 
 	  $this->binName = $binName;
 	
@@ -104,6 +111,8 @@ abstract class Bin {
 	  $this->sessionData = $sessionData;
 
 	  $this->payload = $payload;
+
+	  $this->controller = $controller;
    }
  }
 ?>
