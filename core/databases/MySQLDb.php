@@ -206,10 +206,10 @@ class MySQLDb {
 
 	$dbWhere = $this->prepare($where, $table);
 
-	 if (count($dbwhere) > 0) {
+	 if (count($dbWhere) > 0) {
       $sql .= ' WHERE ';
 
-      foreach ($dbwhere as $key => $val) {
+      foreach ($dbWhere as $key => $val) {
         if ($wheresql) { $wheresql .= ' AND '; }
         if (substr($key,-1)=='!') {
           $key = substr($key,0,strlen($key)-1);
@@ -381,7 +381,8 @@ class MySQLDb {
     foreach($array as $index => $data){
        foreach($dbInfo as $info){
         if($index == $info['Field']){
-            switch(preg_match('/[a-zA-Z]+/',strtolower($info['Type']))){
+			preg_match('/[a-zA-Z]+/',strtolower($info['Type']), $match);
+            switch($match[0]){
                	case 'varchar':
 				case 'char':
 				case 'date':
