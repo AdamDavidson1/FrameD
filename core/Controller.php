@@ -203,6 +203,7 @@ abstract class Controller{
 		if($this->format == '' || strtolower($this->format) == 'html' || strtolower($this->format) == 'php' && $view != NULL){
 
 		   $logger = new Logger($view);
+		   $config = $this->config;
 		   if(is_file('app/views/html/'.$view.'.php')){
 
 			   $this->logger->trace('LOADING VIEW: '.$view);
