@@ -103,13 +103,53 @@ class CpanelPlugin extends Plugin{
 	}
 
     public function getZoneRecord($domain, $line=1){
-		$ret = $this->dumpZone();
-
-		foreach($ret->result[0]->record as $record){
-			if($record->name == $domain.'.'.$this->domain.'.'){
+		$ret = $this->getData('cpanel', array('user' => $this->user,
+											  'cpanel_jsonapi_module' => 'SubDomain', 
+											  'cpanel_jsonapi_func' => 'listsubdomains',
+											  'cpanel_jsonapi_apiversion' => 2));
+		/*stdClass Object
+(
+    [cpanelresult] => stdClass Object
+        (
+            [data] => Array
+                (
+                    [0] => stdClass Object
+                        (
+                            [domainkey] => airnotion_gatevo.com
+                            [status] => not redirected
+                            [reldir] => home:airnotion.com
+                            [dir] => /home/darkken/airnotion.com
+                            [subdomain] => airnotion
+                            [rootdomain] => gatevo.com
+                            [domain] => airnotion.gatevo.com
+                            [basedir] => airnotion.com
+                        )
+*/
+		foreach($ret->cpanelresult->data as $record){
+			if($record->domain == $domain.'.'.$this->domain){
 				return $record;
 			}
 		}
+	}
+
+	public function addSubdomain($domain){
+		return $this->getData('cpanel', array('user' => $this->user,
+									   'cpanel_jsonapi_module' => 'SubDomain',
+									   'cpanel_jsonapi_func' => 'addsubdomain',
+									   'cpanel_jsonapi_apiversion' => 2,
+									   'dir' => $this->userdir,
+									   'rootdomain' => $this->domain,
+									   'domain' => $domain
+									   ));
+	}
+
+	public function delSubdomain($domain){
+		return $this->getData('cpanel', array('user' => $this->user,
+                                       'cpanel_jsonapi_module' => 'SubDomain',
+                                       'cpanel_jsonapi_func' => 'delsubdomain',
+                                       'cpanel_jsonapi_apiversion' => 2,
+                                       'domain' => $domain.'.'.$this->domain
+                                       ));
 	}
 
     public function dumpZone(){
@@ -235,11 +275,12 @@ class CpanelPlugin extends Plugin{
  * @return void
  */
 	private function getConfig(){
-		$this->port   = $this->config->application[$this->package]['connect']['port'];
-		$this->ssl    = $this->config->application[$this->package]['connect']['ssl'] == 'Yes' ? true : false;
-		$this->domain = $this->config->application[$this->package]['connect']['domain'];
-		$this->user   = $this->config->application[$this->package]['connect']['user'];
-		$this->pass   = $this->config->application[$this->package]['connect']['pass'];
+		$this->port    = $this->config->application[$this->package]['connect']['port'];
+		$this->ssl     = $this->config->application[$this->package]['connect']['ssl'] == 'Yes' ? true : false;
+		$this->domain  = $this->config->application[$this->package]['connect']['domain'];
+		$this->user    = $this->config->application[$this->package]['connect']['user'];
+		$this->pass    = $this->config->application[$this->package]['connect']['pass'];
+		$this->userdir = $this->config->application[$this->package]['connect']['userdir'];
 	}
 
 /**
