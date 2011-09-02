@@ -169,7 +169,33 @@ class PayloadPkg{
  * @return array
  */
     public function getHash($delimiter=','){
-	   return explode($delimiter, $this->data);
+	   if($this->data){
+			   $data = explode($delimiter, $this->data);
+
+			   if(strstr('=',$this->data)){
+					   foreach($data as $item){
+						  $parts = explode('=',$item);
+						  $ret[$parts[0]] = $parts[1];
+					   }
+			   }else {
+				$ret = $data;
+			   }
+			   unset($parts);
+			   unset($data);
+			   return $ret;
+	   } else {
+			   return false;
+	   }
+    }
+
+/**
+ * GetArray
+ * 
+ * @access public
+ * @return array
+ */
+    public function getArray($from='ANY'){
+	   return is_array($this->data) ? $this->data : array();
     }
 }
 

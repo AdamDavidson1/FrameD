@@ -37,6 +37,14 @@ class UserStructure extends Model{
   public $dbName = "framed";
 
   /**
+    * Database Name
+    * 
+    * @access public
+    * @var string
+    */
+  public $dbCfg = "framed";
+
+  /**
     * Table Name
     * 
     * @access public
@@ -80,7 +88,7 @@ class UserStructure extends Model{
 
 	$dbLoader = new DbLoader();
 
-	$this->db = $dbLoader->load($this->dbName);
+	$this->db = $dbLoader->load($this->dbCfg);
 
 	$this->db->$tableName = $this->tableData;
   }

@@ -58,7 +58,7 @@ class BinLoader {
  * @access private
  * @return obj model object 
  */
-   public function load($bin, $payload, $sessionData){
+   public function load($bin, $payload, $sessionData, $controller){
 
 	$binFile = strtolower(str_replace('Bin', '',$bin));
 
@@ -85,7 +85,7 @@ class BinLoader {
 	}
 	$class = $bin;
 
-	$binObj = new $class($bin, $payload, $sessionData);
+	$binObj = new $class($bin, $payload, $sessionData, $controller);
 
 	if(!method_exists($binObj, 'load')){
 		$this->logger->error("Loading $bin Failed. Load Method Not Defined");
@@ -115,7 +115,7 @@ class BinLoader {
 			$args[] = $payload->getParam($param->name);
 		}
 		if($pkgClass == 'SessionDataPkg'){
-			$args[] = $bundle->sessionData->getPkg($param->name);
+			$args[] = $sessionData->getPkg($param->name);
 		}
 		if($pkgClass == 'PayloadStackPkg'){
 			$args[] = $payload->getStack($param->name);

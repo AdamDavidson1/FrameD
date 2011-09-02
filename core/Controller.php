@@ -90,6 +90,14 @@ abstract class Controller{
     */
     public $sessionData;
 
+	/**
+    * Plugin Loader
+    * 
+    * @access public
+    * @var mixed
+    */
+	public $pluginLoader;
+
 /**
  * Controller Construct
  * 
@@ -104,6 +112,7 @@ abstract class Controller{
 		$this->config = new Config();
 		$this->dbLoader = new DbLoader();
 		$this->configLoader = new ConfigLoader();
+		$this->pluginLoader = new PluginLoader();
     }
 
 /**
@@ -173,6 +182,14 @@ abstract class Controller{
  * @return void
  */
 	public function render($view=NULL){
+
+		if($this->cameFrom != 'cli'){
+				header('Set-Cookie: '.$this->config->environment['SESSIONDATA']['cookie']['name'].'='.
+				 urlencode($this->sessionData->getEncrypted()).'; HttpOnly');
+		}
+
+
+		ob_start();
 		$data = $this->data;
 
 		if($this->metadata){
@@ -181,20 +198,10 @@ abstract class Controller{
 				}
 		}
 
-		if($this->cameFrom != 'cli'){
-				header('Set-Cookie: '.
-				 $this->config->environment['SESSIONDATA']['cookie']['name'].'='.
-				 urlencode($this->sessionData->getEncrypted()).'; HttpOnly'
-				 );
-		}
-
-		$this->callResponseHeader();
+		//$this->callResponseHeader();
 
 		if($this->format == '' || strtolower($this->format) == 'html' || strtolower($this->format) == 'php' && $view != NULL){
 
-		   if($this->config->application['SERVER']['minify_html'] == 'On'){
-		   		ob_start();
-		   }
 		   $logger = new Logger($view);
 		   if(is_file('app/views/html/'.$view.'.php')){
 
@@ -216,6 +223,8 @@ abstract class Controller{
 				   $minify = new Minify_HTML($return, array()); 
 
 				   echo $minify->process();
+		   }else {
+				ob_end_flush();
 		   }
 		} else {
 		    $logger = new Logger($view);
@@ -384,4 +393,3 @@ abstract class Controller{
     		return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"."\n".$serializer->serialize($array);
 	}
 }
-?>

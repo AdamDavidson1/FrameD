@@ -59,8 +59,8 @@ final class Config{
 		$default_environment = $configLoader->load('default_environment');
 		$default_application = $configLoader->load('default_application');
 
-		$this->environment = array_merge($configLoader->load('environment'), $default_environment);
-		$this->application = array_merge($configLoader->load('application'), $default_application);
+		$this->environment = array_merge($default_environment, $configLoader->load('environment'));
+		$this->application = array_merge($default_application, $configLoader->load('application'));
    }
 }
 ?>

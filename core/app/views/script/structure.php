@@ -18,7 +18,7 @@ require_once("core/databases/'.$data['dbType'].'Db.php");
 /**
  * '.$data['table'].'Stucture Class
  * 
- * @package '.$data['dbCfg'].'
+ * @package '.$data['dbName'].'
  * @subpackage models
  */
 class '.$data['table'].'Structure extends Model{

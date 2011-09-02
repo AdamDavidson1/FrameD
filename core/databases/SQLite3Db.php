@@ -51,7 +51,7 @@ class SQLite3Db {
    function __construct($db){
 	$this->config = new Config();
 	
-	$this->db_name = $this->config->environment['DB'][$db]['db'];
+	$this->db_name = $db;
 	$this->db_file = $this->config->environment['DB'][$db]['file'];
 
     $this->logger = new Logger('SQLite3DB');
@@ -159,18 +159,20 @@ class SQLite3Db {
  * @param string $table   Table name on which you want to query
  * @param array  $select  names of columns you wish to query
  * @param array  $where   key/value pair where value is the column value and the key is the column name
+ * @param array  $addendum  additional items for query
  * @return array db rows
  */
-   public function smartSelect($table, $select, $where){
+   public function smartSelect($table, $select, $where, $addendum=null){
+	
     if($select){
-	   $dbSelect = $this->prepareColumns($select, ',');
+	   $dbSelect = $this->prepareColumns($select, ',', $table);
 	} else {
-	   $dbSelect = "* ";
+	   $dbSelect = "*";
 	}
 
 	$sql .= 'SELECT '.$dbSelect.' FROM '.$table;
 
-	$dbWhere = $this->prepare($table, $where);
+	$dbWhere = $this->prepare($where, $table);
 
 	 if (count($dbwhere) > 0) {
       $sql .= ' WHERE ';
@@ -180,7 +182,19 @@ class SQLite3Db {
         if (substr($key,-1)=='!') {
           $key = substr($key,0,strlen($key)-1);
           $wheresql .= $key . ' <> ' . $val;
-        } else {
+        }elseif(substr($key,-1)=='>'){
+          $key = substr($key,0,strlen($key)-1);
+          $wheresql .= $key . ' > ' . $val;
+		}elseif(substr($key,-1)=='<'){
+          $key = substr($key,0,strlen($key)-1);
+          $wheresql .= $key . ' < ' . $val;
+		}elseif(substr($key,-2)=='>='){
+          $key = substr($key,0,strlen($key)-2);
+          $wheresql .= $key . ' >= ' . $val;
+		}elseif(substr($key,-2)=='<='){
+          $key = substr($key,0,strlen($key)-2);
+          $wheresql .= $key . ' <= ' . $val;
+		}else {
           $wheresql .= $key . '=' . $val;
         }
       }
@@ -188,12 +202,32 @@ class SQLite3Db {
       $sql .= $wheresql;
     }
 
+	if($addendum){
+		if(is_array($addendum)){
+			if($addendum['group']){
+				$sql .= ' GROUP BY '.implode(',', $addendum['group']);
+			}
+			if($addendum['order']){
+				$sql .= ' ORDER BY ';
+				foreach($addendum['order'] as $index => $item){
+					$order[] = $index.' '.$item;
+				}
+				$sql .= implode(',',$order);
+				unset($order);
+			}
+			if($addendum['limit']){
+				$sql .= ' LIMIT '.$addendum['limit'][0].($addendum['limit'][1] ? ', '.$addendum['limit'][1] : '');
+			}
+		}else {
+			$sql .= ' '.$addendum;
+		}
+	}
+
 	$sql .= ';';
 
 	return $this->query($sql);
 
    }
-
 
 /**
  * SmartSelectOne
@@ -205,36 +239,9 @@ class SQLite3Db {
  * @return array db rows
  */
    public function smartSelectOne($table, $select, $where){
-    if($select){
-	   $dbSelect = $this->prepareColumns($select, ',', $table);
-	} else {
-	   $dbSelect = "* ";
-	}
 
-	$sql .= 'SELECT '.$dbSelect.' FROM '.$table;
-
-	$dbwhere = $this->prepare($where, $table);
-
-	 if (count($dbwhere) > 0) {
-      $sql .= ' WHERE ';
-
-      foreach ($dbwhere as $key => $val) {
-        if ($wheresql) { $wheresql .= ' AND '; }
-        if (substr($key,-1)=='!') {
-          $key = substr($key,0,strlen($key)-1);
-          $wheresql .= $key . ' <> ' . $val;
-        } else {
-          $wheresql .= $key . '=' . $val;
-        }
-      }
-
-      $sql .= $wheresql;
-    }
-
-	$sql .= ' LIMIT 1;';
-
-	$ret = $this->query($sql);
-
+	$ret = $this->smartSelect($table, $select, $where, ' LIMIT 1');
+    
     return $ret[0];
 
    }
@@ -302,6 +309,8 @@ class SQLite3Db {
  * @return string delimited string
  */
    private function prepareColumns($data, $delimiter=',',$table){
+
+	$this->logger->debug('prepareColumns: '.print_r($table,1));
       $dbInfo = $this->getTableData($table);
 	  foreach($data as $column){
 		foreach($dbInfo as $info){
@@ -333,10 +342,14 @@ class SQLite3Db {
  * @return array striped and cleaned data for query
  */
    private function prepare($array, $table){
+	$this->logger->debug('prepare: '.print_r($table,1));
     $dbInfo = $this->getTableData($table);
 	if(!$dbInfo){
 		$this->logger->error('Table '.$table.' does not exist');
 		return;
+	}
+	if(!is_array($array)){
+		return false;
 	}
     foreach($array as $index => $data){
        foreach($dbInfo as $info){
@@ -373,6 +386,8 @@ class SQLite3Db {
  */
    public function getTableData($table){
 
+	  $this->logger->debug(print_r($table,1));
+
       if(!$this->$table){
 		 $this->$table = $this->query('PRAGMA table_info('.$table.');');
       }
@@ -400,7 +415,8 @@ class SQLite3Db {
  * @return string delimited string
  */
    private function prepareData($array, $table, $delimiter){
-	$dbInfo = $this->getTableData();
+	$this->logger->debug('prepareData: '.print_r($table,1));
+	$dbInfo = $this->getTableData($table);
 	if(!$dbInfo){
 		$this->logger->error('Table '.$table.' does not exist');
 		return;

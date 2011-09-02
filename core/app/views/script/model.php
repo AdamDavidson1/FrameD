@@ -7,13 +7,13 @@ echo
  * 
  * @author Adam Davidson <dark@gatevo.com>
  * @version 1.0
- * @package '.$data['dbCfg'].'
+ * @package '.$data['dbName'].'
  */
 
 /**
  * '.$data['table'].' Structure
  */
-require_once("app/models/'.$data['dbCfg'].'/structure/'.$data['tableName'].'_struct.php");
+require_once("'.$data['coreModels'].'app/models/'.$data['dbName'].'/structure/'.$data['tableName'].'_struct.php");
 
 /**
  * '.$data['table'].'Model Class

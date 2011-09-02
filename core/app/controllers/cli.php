@@ -44,6 +44,8 @@ class CliController extends Controller {
 				$this->setViewData(array('dbType' => $this->config->environment['DB'][$name->getString()]['type'],
 										 'columns' => $columns, 
 										 'dbName' => $name->getString(), 
+										 'dbCfg' => $name->getString(), 
+										 'coreModels' => $coreModels,
 										 'tableName' => $table['Tables_in_'.$name->getString()],
 										 'table' => $this->makeModelName($table['Tables_in_'.$name->getString()])));
 
