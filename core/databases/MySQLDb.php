@@ -213,21 +213,21 @@ class MySQLDb {
         if ($wheresql) { $wheresql .= ' AND '; }
         if (substr($key,-1)=='!') {
           $key = substr($key,0,strlen($key)-1);
-          $wheresql .= $key . ' <> ' . $val;
+          $wheresql .= '`'.$key.'`' . ' <> ' . $val;
         }elseif(substr($key,-1)=='>'){
           $key = substr($key,0,strlen($key)-1);
-          $wheresql .= $key . ' > ' . $val;
+          $wheresql .= '`'.$key.'`' . ' > ' . $val;
 		}elseif(substr($key,-1)=='<'){
           $key = substr($key,0,strlen($key)-1);
-          $wheresql .= $key . ' < ' . $val;
+          $wheresql .= '`'.$key.'`' . ' < ' . $val;
 		}elseif(substr($key,-2)=='>='){
           $key = substr($key,0,strlen($key)-2);
-          $wheresql .= $key . ' >= ' . $val;
+          $wheresql .= '`'.$key.'`' . ' >= ' . $val;
 		}elseif(substr($key,-2)=='<='){
           $key = substr($key,0,strlen($key)-2);
-          $wheresql .= $key . ' <= ' . $val;
+          $wheresql .= '`'.$key.'`' . ' <= ' . $val;
 		}else {
-          $wheresql .= $key . '=' . $val;
+          $wheresql .= '`'.$key.'`' . '=' . $val;
         }
       }
 
@@ -308,9 +308,9 @@ class MySQLDb {
         if ($wheresql) { $wheresql .= ' AND '; }
         if (substr($key,-1)=='!') {
           $key = substr($key,0,strlen($key)-1);
-          $wheresql .= $key . ' <> ' . $val;
+          $wheresql .= '`'.$key.'`' . ' <> ' . $val;
         } else {
-          $wheresql .= $key . '=' . $val;
+          $wheresql .= '`'.$key.'`' . '=' . $val;
         }
       }
 
